@@ -31,7 +31,6 @@ function object_values(o) {
 
 function load_bug_details(bug_data) {
   var bugs = new Set(object_values(bug_data).reduce((a, b) => a.concat(b), []).filter(x => Number.isInteger(x)));
-  console.log(`bugs: ${Array.from(bugs).join(',')}`);
   return new Promise((resolve, reject) => {
     var req = new XMLHttpRequest();
     req.responseType = 'json';
