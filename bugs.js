@@ -1,4 +1,14 @@
-function get_etherpad_bug_data() {
+const TAG_DESC = {
+  'rm': 'should be removed',
+  'android': 'Android-specific',
+  'windows': 'Windows-specific',
+  'tup': 'Blocks tup backend for Linux',
+  'l10n': 'Impacts l10n repacks',
+  'tests': 'Test-only content',
+  'gen_files': 'Can be replaced with GENERATED_FILES',
+  'xpi': 'Creates XPI files',
+};
+function get_etherpad_data() {
   return new Promise((resolve, reject) => {
     var req = new XMLHttpRequest();
     req.responseType = 'json';
@@ -20,7 +30,8 @@ function object_values(o) {
 }
 
 function load_bug_details(bug_data) {
-  var bugs = new Set(object_values(bug_data).reduce((a, b) => a.concat(b), []));
+  var bugs = new Set(object_values(bug_data).reduce((a, b) => a.concat(b), []).filter(x => Number.isInteger(x)));
+  console.log(`bugs: ${Array.from(bugs).join(',')}`);
   return new Promise((resolve, reject) => {
     var req = new XMLHttpRequest();
     req.responseType = 'json';
@@ -55,16 +66,27 @@ function dom_loaded() {
   });
 }
 
-function fill_table_with_bugs(data) {
+function fill_table_with_bugs_and_tags(data) {
   console.log('filling table');
   var t = document.getElementsByTagName('table')[0].tBodies[0];
   var no_bug_files = 0;
   for (var row of t.rows) {
     var cells = row.cells;
     var f = cells[1].textContent;
+    var has_bugs = false;
     if (f in data.files) {
-      cells[2].innerHTML = data.files[f].map((b) => data.bugs.get(b)).join(' ');
-    } else {
+      var bugs = data.files[f].filter(x => Number.isInteger(x)).map((b) => data.bugs.get(b));
+      var tags = data.files[f].filter(x => !Number.isInteger(x));
+      if (bugs.length > 0) {
+        has_bugs = true;
+      }
+      cells[2].innerHTML = bugs.join(' ');
+      for (var tag of tags) {
+        var title = TAG_DESC[tag] || '';
+        cells[3].innerHTML += `<span title="${title}">${tag}</span> `;
+      }
+    }
+    if (!has_bugs) {
       row.className = 'nobug';
       no_bug_files++;
     }
@@ -73,8 +95,8 @@ function fill_table_with_bugs(data) {
   document.getElementById('no_bug_percent').textContent = (100 * no_bug_files / t.rows.length).toFixed(2);
 }
 
-Promise.all([get_etherpad_bug_data().then(load_bug_details),
+Promise.all([get_etherpad_data().then(load_bug_details),
              dom_loaded(),
             ])
-  .then((data) => fill_table_with_bugs(data[0]))
+  .then((data) => fill_table_with_bugs_and_tags(data[0]))
   .catch((e) => console.error(e));
