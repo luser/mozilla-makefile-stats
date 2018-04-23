@@ -6,15 +6,15 @@ const TAG_DESC = {
   'l10n': 'Impacts l10n repacks',
   'tests': 'Test-only content',
   'gen_files': 'Can be replaced with GENERATED_FILES',
-  'xpi': 'Creates XPI files',
+  'xpi': 'Creates XPI files'
 };
-function get_etherpad_data() {
+function get_bug_data() {
   return new Promise((resolve, reject) => {
     var req = new XMLHttpRequest();
     req.responseType = 'json';
-    req.onload = () => { console.log('Got etherpad data'); resolve(req.response); };
+    req.onload = () => { console.log('Got bug data'); resolve(req.response); };
     req.onerror = (e) => reject(e);
-    req.open('GET', 'https://public.etherpad-mozilla.org/p/makefile-conversion-bugs/export/txt', true);
+    req.open('GET', 'bugs.json', true);
     req.send(null);
   });
 }
@@ -94,7 +94,7 @@ function fill_table_with_bugs_and_tags(data) {
   document.getElementById('no_bug_percent').textContent = (100 * no_bug_files / t.rows.length).toFixed(2);
 }
 
-Promise.all([get_etherpad_data().then(load_bug_details),
+Promise.all([get_bug_data().then(load_bug_details),
              dom_loaded(),
             ])
   .then((data) => fill_table_with_bugs_and_tags(data[0]))
