@@ -30,7 +30,7 @@
 "toolkit/crashreporter/client/Makefile.in": [1223530, 1223748],
 "toolkit/components/maintenanceservice/Makefile.in": [1223530, "windows"],
 "toolkit/components/ctypes/tests/Makefile.in": [1259806],
-"browser/app/Makefile.in": [1223530, 1223748, 1255485, "tup"],
+"browser/app/Makefile.in": [1223530, 1223748, 1255485, 1459004, "tup"],
 "js/src/gdb/Makefile.in": [1252931],
 "security/sandbox/win/wow_helper/Makefile.in": [1223535],
 "b2g/app/Makefile.in": [1223748, 1255485],
